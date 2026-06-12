@@ -68,12 +68,20 @@ bool Application::create(int w, int h, std::string title)
     running = true;
 
     // TODO Refactor this out
-        float vertices[] = 
+    float vertices[] = 
     {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    }; 
+        // first triangle
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f,  // top left 
+    };
+
+    unsigned int indices[] =
+    {
+        0, 1, 3, // first triangle
+        1, 2, 3 // second triangle
+    };
 
     const char* vertex_shader_source = 
         "#version 330 core\n"
@@ -137,20 +145,30 @@ bool Application::create(int w, int h, std::string title)
         SDL_Log("ERROR: Failed To Link Shader Program: \n%s", info_log);
     }
 
-    // VAO and VBO
-    unsigned int VBO;
+    unsigned int VBO, EBO;
+
+    // VAO (Holds VBO, EBO, and attributes)
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
+
+    // VBO
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // Atributes
+    // EBO
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+
+    // Attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     return true;
 }
@@ -188,7 +206,7 @@ void Application::render_loop()
 
     glUseProgram(shader_program); // Use shader program from earlier
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     SDL_GL_SwapWindow(window);
 }
