@@ -2,11 +2,10 @@
 #include <SDL3/SDL_log.h>
 #include <glad/glad.h>
 
-ShaderProgram::ShaderProgram(const string vertex_source, const string frag_source)
+Shader::Shader(const string& vertex_source, const string& frag_source)
 {
     // Vertex Shader
     unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-
     const char* temp = vertex_source.c_str();
     glShaderSource(vertex_shader, 1, &(temp), NULL);
     glCompileShader(vertex_shader);
@@ -41,6 +40,7 @@ ShaderProgram::ShaderProgram(const string vertex_source, const string frag_sourc
     glAttachShader(id, vertex_shader);
     glAttachShader(id, frag_shader);
     glLinkProgram(id);
+
     glDeleteShader(vertex_shader);
     glDeleteShader(frag_shader);
 
@@ -51,4 +51,24 @@ ShaderProgram::ShaderProgram(const string vertex_source, const string frag_sourc
         SDL_Log("ERROR: Failed To Link Shader Program: \n%s", info_log);
         throw "Shader Link Failure";
     }
+}
+
+void Shader::use()
+{
+    glUseProgram(id);
+}
+
+void Shader::set_bool(const string &name, const bool val) const
+{
+    glUniform1i(glGetUniformLocation(id, name.c_str()), (int)val);
+}
+
+void Shader::set_int(const string &name, const int val) const
+{
+    glUniform1i(glGetUniformLocation(id, name.c_str()), val);
+}
+
+void Shader::set_float(const string &name, const float val) const
+{
+    glUniform1f(glGetUniformLocation(id, name.c_str()), val);
 }

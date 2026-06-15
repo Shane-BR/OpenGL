@@ -3,4 +3,4 @@
 
 using std::string;
 
-string get_file_content(string filename);
+string get_file_content(const string& filename);

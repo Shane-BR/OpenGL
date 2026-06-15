@@ -4,7 +4,6 @@
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_log.h>
-#include <cmath>
 #include <string>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
@@ -12,24 +11,26 @@
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
 
+using std::string;
+
 class Application
 {
 private:
     SDL_Window* window;
-    std::string title;
+    string title;
     bool running;
 
     // TODO refactor this out
     unsigned int VAO, program_id;
     
 public:
-    bool create(int w, int h, std::string title);
+    bool init(int w, int h, const string& title);
     void main_loop();
     void render_loop();
     ~Application() { SDL_Quit(); }
 };
-
-bool Application::create(int w, int h, std::string title)
+// TODO maybe use a constructor
+bool Application::init(int w, int h, const string& title)
 {
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
     {
@@ -86,12 +87,12 @@ bool Application::create(int w, int h, std::string title)
         1, 2, 3 // second triangle
     };
 
-    const string vertex_shader_source = get_file_content("../res/shaders/main.vert");
+    const string vertex_shader_source = get_file_content("../res/shaders/main.vs");
     
-    const string frag_shader_source = get_file_content("../res/shaders/main.frag");
+    const string frag_shader_source = get_file_content("../res/shaders/main.fs");
 
     // getting the id and discarding the actual object is stoopid, but THIS IS TEMPORARY
-    program_id = ShaderProgram(vertex_shader_source, frag_shader_source).get_id();
+    program_id = Shader(vertex_shader_source, frag_shader_source).get_id();
 
     unsigned int VBO, EBO;
 
@@ -169,7 +170,7 @@ void Application::render_loop()
 int main ()
 {
     Application app;
-    app.create(800, 600, "OpenGL");
+    app.init(800, 600, "OpenGL");
     app.main_loop();
 
     return 0;
