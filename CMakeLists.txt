@@ -13,7 +13,6 @@ PRIVATE
     src/main.cpp
     src/shader.cpp
     src/utils.cpp
-    src/window.cpp
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)

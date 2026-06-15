@@ -2,7 +2,7 @@
 #include <SDL3/SDL_log.h>
 #include <glad/glad.h>
 
-ShaderProgram::ShaderProgram(string vertex_source, string frag_source)
+ShaderProgram::ShaderProgram(const string vertex_source, const string frag_source)
 {
     // Vertex Shader
     unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -18,6 +18,7 @@ ShaderProgram::ShaderProgram(string vertex_source, string frag_source)
     {
         glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
         SDL_Log("ERROR: Vertex Shader Compilation Failed: \n%s", info_log);
+        throw "Shader Compilation Failure";
     }
 
     // Fragment Shader
@@ -32,6 +33,7 @@ ShaderProgram::ShaderProgram(string vertex_source, string frag_source)
     {
         glGetShaderInfoLog(frag_shader, 512, NULL, info_log);
         SDL_Log("ERROR: Fragment Shader Compilation Failed: \n%s", info_log);
+        throw "Shader Compilation Failure";
     }
 
     // Shader program
@@ -47,5 +49,6 @@ ShaderProgram::ShaderProgram(string vertex_source, string frag_source)
     {
         glGetProgramInfoLog(id, 512, NULL, info_log);
         SDL_Log("ERROR: Failed To Link Shader Program: \n%s", info_log);
+        throw "Shader Link Failure";
     }
 }

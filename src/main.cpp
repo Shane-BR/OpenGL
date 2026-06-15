@@ -1,7 +1,10 @@
 #include "shader.hpp"
+#include "utils.hpp"
+#include "utils.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_log.h>
+#include <cmath>
 #include <string>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
@@ -83,24 +86,11 @@ bool Application::create(int w, int h, std::string title)
         1, 2, 3 // second triangle
     };
 
-    const char* vertex_shader_source = 
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0"
-    ;
+    const string vertex_shader_source = get_file_content("../res/shaders/main.vert");
     
-    const char* frag_shader_source =
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\0"
-    ;
+    const string frag_shader_source = get_file_content("../res/shaders/main.frag");
 
+    // getting the id and discarding the actual object is stoopid, but THIS IS TEMPORARY
     program_id = ShaderProgram(vertex_shader_source, frag_shader_source).get_id();
 
     unsigned int VBO, EBO;
@@ -165,7 +155,16 @@ void Application::render_loop()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    using std::sin;
+
+    float time = SDL_GetTicks();
+    time = time / 1000;
+    float green_val = (sin(time / 2.0f) + 0.5f);
+    int v_color_loc = glGetUniformLocation(program_id, "color");
+
     glUseProgram(program_id); // Use shader program from earlier
+    glUniform4f(v_color_loc, 0.0f, green_val, 0.0f, 1.0f); // Uniform
+    
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
