@@ -73,11 +73,11 @@ bool Application::create(int w, int h, std::string title)
     // TODO Refactor this out
     float vertices[] = 
     {
-        // first triangle
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f,  // top left 
+        // pos                                   // colors
+        0.5f,  0.5f, 0.0f,       1.0f, 0.0f, 0.0f,     // top right
+        0.5f, -0.5f, 0.0f,       0.0f, 1.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f // top left 
     };
 
     unsigned int indices[] =
@@ -112,8 +112,11 @@ bool Application::create(int w, int h, std::string title)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0); // position
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1); // color
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -155,16 +158,8 @@ void Application::render_loop()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    using std::sin;
-
-    float time = SDL_GetTicks();
-    time = time / 1000;
-    float green_val = (sin(time / 2.0f) + 0.5f);
-    int v_color_loc = glGetUniformLocation(program_id, "color");
-
     glUseProgram(program_id); // Use shader program from earlier
-    glUniform4f(v_color_loc, 0.0f, green_val, 0.0f, 1.0f); // Uniform
-    
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
