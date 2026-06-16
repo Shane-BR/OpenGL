@@ -91,12 +91,8 @@ bool Application::init(int w, int h, const string& title)
         1, 2, 3 // second triangle
     };
 
-    const string vertex_shader_source = get_file_content("../res/shaders/main.vs");
-    
-    const string frag_shader_source = get_file_content("../res/shaders/main.fs");
-
     // getting the id and discarding the actual object is stoopid, but THIS IS TEMPORARY
-    program_id = Shader(vertex_shader_source, frag_shader_source).get_id();
+    program_id = Shader("../res/shaders/main.vs", "../res/shaders/main.fs").get_id();
 
     unsigned int VBO; 
     unsigned int EBO;

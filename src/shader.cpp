@@ -1,13 +1,17 @@
 #include "shader.hpp"
+#include "utils.hpp"
 #include <SDL3/SDL_log.h>
 #include <glad/glad.h>
 
-Shader::Shader(const string& vertex_source, const string& frag_source)
+Shader::Shader(const string& vertex_filename, const string& frag_filename)
 {
+    const string vertex_source = get_file_content(vertex_filename);
+    const string frag_source = get_file_content(frag_filename);
+
     // Vertex Shader
     unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     const char* temp = vertex_source.c_str();
-    glShaderSource(vertex_shader, 1, &(temp), NULL);
+    glShaderSource(vertex_shader, 1, &temp, NULL);
     glCompileShader(vertex_shader);
 
     int  success;

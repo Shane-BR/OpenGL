@@ -9,7 +9,7 @@ class Shader
 private:
     unsigned int id;
 public:
-    Shader(const string& vertex_source, const string& frag_source);
+    Shader(const string& vertex_filename, const string& frag_filename);
     void use();
 
     // Uniform query and assign methods
