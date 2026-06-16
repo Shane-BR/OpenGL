@@ -1,11 +1,14 @@
 #version 330 core
-layout (location = 0) in vec3 a_pos; // the position variable has attribute position 0
+layout (location = 0) in vec3 a_pos;
 layout (location = 1) in vec3 a_color;
+layout (location = 2) in vec2 a_tex_coords;
 
 out vec3 color;
+out vec2 tex_coords;
 
 void main()
 {
-    gl_Position = vec4(a_pos, 1.0); // see how we directly give a vec3 to vec4's constructor
+    gl_Position = vec4(a_pos, 1.0);
     color = a_color;
+    tex_coords = a_tex_coords;
 }

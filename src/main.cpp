@@ -11,6 +11,10 @@
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
 
+// TODO decide to keep or make my own implementation
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using std::string;
 
 class Application
@@ -21,7 +25,7 @@ private:
     bool running;
 
     // TODO refactor this out
-    unsigned int VAO, program_id;
+    unsigned int VAO, program_id, texture;
     
 public:
     bool init(int w, int h, const string& title);
@@ -74,11 +78,11 @@ bool Application::init(int w, int h, const string& title)
     // TODO Refactor this out
     float vertices[] = 
     {
-        // pos                                   // colors
-        0.5f,  0.5f, 0.0f,       1.0f, 0.0f, 0.0f,     // top right
-        0.5f, -0.5f, 0.0f,       0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f // top left 
+    // positions          // colors           // texture coords
+    0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+    0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
 
     unsigned int indices[] =
@@ -94,7 +98,8 @@ bool Application::init(int w, int h, const string& title)
     // getting the id and discarding the actual object is stoopid, but THIS IS TEMPORARY
     program_id = Shader(vertex_shader_source, frag_shader_source).get_id();
 
-    unsigned int VBO, EBO;
+    unsigned int VBO; 
+    unsigned int EBO;
 
     /* Basic quad buffer */
 
@@ -113,11 +118,40 @@ bool Application::init(int w, int h, const string& title)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0); // position
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1); // color
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
+    glEnableVertexAttribArray(2); // texture
+
+    // Texture
+    int width, height, nr_channels;
+    unsigned char* data = stbi_load("../res/textures/container.jpg", &width, &height, &nr_channels, 0);
+
+    if (!data)
+    {
+        SDL_Log("Failed to load texture!\n");
+    }
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D
+    (
+        GL_TEXTURE_2D, 0, GL_RGB, width, height,
+        0, GL_RGB, GL_UNSIGNED_BYTE, data
+    );
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -161,6 +195,7 @@ void Application::render_loop()
 
     glUseProgram(program_id); // Use shader program from earlier
 
+    glBindTexture(GL_TEXTURE_2D, texture); // Automatically applies to VAO frag uniform
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
