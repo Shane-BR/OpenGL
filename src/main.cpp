@@ -159,8 +159,9 @@ void Application::render_loop()
     glClear(GL_COLOR_BUFFER_BIT);
 
     // TODO Remove
-    shaders.at(0).use();
-    textures.at(0).bind(0);
+    shaders[0].use();
+    textures[0].bind(0);
+    textures[1].bind(1);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -175,6 +176,10 @@ int main ()
     // TODO remove
     shaders.emplace_back(Shader("../res/shaders/main.vs","../res/shaders/main.fs"));
     textures.emplace_back(Texture("../res/textures/container.jpg"));
+    textures.emplace_back(Texture("../res/textures/awesomeface.png"));
+
+    shaders[0].set_int("u_texture1", 0);
+    shaders[0].set_int("u_texture2", 1);
 
     app.main_loop();
 
