@@ -8,6 +8,18 @@ Shader::Shader(const string& vertex_filename, const string& frag_filename)
     const string vertex_source = get_file_content(vertex_filename);
     const string frag_source = get_file_content(frag_filename);
 
+    if (vertex_source.empty())
+    {
+        SDL_Log("Failed to read vertex shader at '%s'\n", vertex_filename.c_str());
+        throw "Failed to read shader file";
+    }
+
+    if (frag_source.empty())
+    {
+        SDL_Log("Failed to read fragment shader at '%s'\n", frag_filename.c_str());
+        throw "Failed to read shader file";
+    }
+
     // Vertex Shader
     unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     const char* temp = vertex_source.c_str();

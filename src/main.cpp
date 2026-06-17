@@ -1,6 +1,6 @@
 #include "shader.hpp"
 #include "utils.hpp"
-#include "utils.hpp"
+#include "texture.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_log.h>
@@ -10,12 +10,14 @@
 #include <SDL3/SDL_video.h>
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
-
-// TODO decide to keep or make my own implementation
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <vector>
 
 using std::string;
+
+// TODO Remove
+unsigned int VAO;
+std::vector<Shader> shaders;
+std::vector<Texture> textures;
 
 class Application
 {
@@ -24,22 +26,19 @@ private:
     string title;
     bool running;
 
-    // TODO refactor this out
-    unsigned int VAO, program_id, texture;
-    
 public:
-    bool init(int w, int h, const string& title);
+    Application(int w, int h, const string& title);
     void main_loop();
     void render_loop();
     ~Application() { SDL_Quit(); }
 };
-// TODO maybe use a constructor
-bool Application::init(int w, int h, const string& title)
+
+Application::Application(int w, int h, const string& title)
 {
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
     {
         SDL_Log("Failed to init SDL: %s\n", SDL_GetError());
-        return false;
+        throw "Failed to init SDL";
     }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -54,7 +53,7 @@ bool Application::init(int w, int h, const string& title)
     if (window == NULL)
     {
         SDL_Log("Failed to create SDL window: %s\n", SDL_GetError());
-        return false;                
+        throw "Failed to create window";               
     }
 
     SDL_GLContext ctx = SDL_GL_CreateContext(window);
@@ -62,20 +61,20 @@ bool Application::init(int w, int h, const string& title)
     if (!ctx)
     {
         SDL_Log("Failed to create OpenGL context: %s\n", SDL_GetError());
-        return false;
+        throw "Failed to create OpenGL context";
     }
 
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     {
         SDL_Log("Failed to init GLAD.\n");
-        return false;
+        throw "Failed to init GLAD";
     }
 
     glViewport(0, 0, w, h);
 
     running = true;
 
-    // TODO Refactor this out
+    // TODO Remove
     float vertices[] = 
     {
     // positions          // colors           // texture coords
@@ -90,9 +89,6 @@ bool Application::init(int w, int h, const string& title)
         0, 1, 3, // first triangle
         1, 2, 3 // second triangle
     };
-
-    // getting the id and discarding the actual object is stoopid, but THIS IS TEMPORARY
-    program_id = Shader("../res/shaders/main.vs", "../res/shaders/main.fs").get_id();
 
     unsigned int VBO; 
     unsigned int EBO;
@@ -121,39 +117,12 @@ bool Application::init(int w, int h, const string& title)
     glEnableVertexAttribArray(1); // color
 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
-    glEnableVertexAttribArray(2); // texture
-
-    // Texture
-    int width, height, nr_channels;
-    unsigned char* data = stbi_load("../res/textures/container.jpg", &width, &height, &nr_channels, 0);
-
-    if (!data)
-    {
-        SDL_Log("Failed to load texture!\n");
-    }
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D
-    (
-        GL_TEXTURE_2D, 0, GL_RGB, width, height,
-        0, GL_RGB, GL_UNSIGNED_BYTE, data
-    );
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(data);
+    glEnableVertexAttribArray(2); // texture coords
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    return true;
 }
 
 void Application::main_loop()
@@ -189,9 +158,10 @@ void Application::render_loop()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(program_id); // Use shader program from earlier
+    // TODO Remove
+    shaders.at(0).use();
+    textures.at(0).bind(0);
 
-    glBindTexture(GL_TEXTURE_2D, texture); // Automatically applies to VAO frag uniform
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -200,8 +170,12 @@ void Application::render_loop()
 
 int main ()
 {
-    Application app;
-    app.init(800, 600, "OpenGL");
+    Application app(800, 600, "OpenGL");
+
+    // TODO remove
+    shaders.emplace_back(Shader("../res/shaders/main.vs","../res/shaders/main.fs"));
+    textures.emplace_back(Texture("../res/textures/container.jpg"));
+
     app.main_loop();
 
     return 0;

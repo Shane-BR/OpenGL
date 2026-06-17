@@ -18,8 +18,7 @@ string get_file_content(const string& filename)
 
     if (!f.is_open())
     {
-        SDL_Log("Failed to open file: %s", filename.c_str());
-        return "";
+        return {};
     }
 
     char c;

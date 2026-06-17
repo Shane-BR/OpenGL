@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/build/opengl",
             "args": [],
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}/build/"
         }
     ]
 }
