@@ -8,6 +8,9 @@
 
 Texture::Texture(const string& filename)
 {
+
+    stbi_set_flip_vertically_on_load(true);
+
     int nr_channels;
     unsigned char* data = 
         stbi_load
@@ -66,4 +69,9 @@ void Texture::bind(int unit)
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, id);
+}
+
+unsigned int Texture::get_id()
+{
+    return id;
 }

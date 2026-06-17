@@ -69,22 +69,25 @@ Shader::Shader(const string& vertex_filename, const string& frag_filename)
     }
 }
 
-void Shader::use()
+void Shader::use() const
 {
     glUseProgram(id);
 }
 
 void Shader::set_bool(const string &name, const bool val) const
 {
+    use();
     glUniform1i(glGetUniformLocation(id, name.c_str()), (int)val);
 }
 
 void Shader::set_int(const string &name, const int val) const
 {
+    use();
     glUniform1i(glGetUniformLocation(id, name.c_str()), val);
 }
 
 void Shader::set_float(const string &name, const float val) const
 {
+    use();
     glUniform1f(glGetUniformLocation(id, name.c_str()), val);
 }
