@@ -2,7 +2,7 @@
 #include <SDL3/SDL_log.h>
 #include <glad/glad.h>
 
-// TODO decide to keep or make my own implementation
+// TODO decide to keep, or make my own implementation
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
