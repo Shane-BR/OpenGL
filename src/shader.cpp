@@ -74,6 +74,11 @@ void Shader::use() const
     glUseProgram(id);
 }
 
+unsigned int Shader::get_id()
+{
+    return id;
+}
+
 void Shader::set_bool(const string &name, const bool val) const
 {
     use();

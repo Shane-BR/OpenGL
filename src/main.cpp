@@ -6,6 +6,8 @@
 #include <SDL3/SDL_log.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/trigonometric.hpp>
 #include <string>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
@@ -79,13 +81,6 @@ Application::Application(int w, int h, const string& title)
     glViewport(0, 0, w, h);
 
     running = true;
-
-    // GLM translation
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    SDL_Log("%f, %f, %f\n", vec.x, vec.y, vec.z);
 
     // TODO Remove
     float vertices[] = 
@@ -175,6 +170,13 @@ void Application::render_loop()
     shaders[0].use();
     textures[0].bind(0);
     textures[1].bind(1);
+
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, (SDL_GetTicks() / 1000.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    unsigned int t_loc = glGetUniformLocation(shaders[0].get_id(), "transform");
+    glUniformMatrix4fv(t_loc, 1, GL_FALSE, glm::value_ptr(trans));
+
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

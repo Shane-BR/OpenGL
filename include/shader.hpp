@@ -12,6 +12,8 @@ public:
     Shader(const string& vertex_filename, const string& frag_filename);
     void use() const;
 
+    unsigned int get_id();
+
     // Uniform query and assign methods
     void set_bool(const string &name, const bool val) const;
     void set_int(const string &name, const int val) const;
