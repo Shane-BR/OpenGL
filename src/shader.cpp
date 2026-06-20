@@ -2,6 +2,7 @@
 #include "utils.hpp"
 #include <SDL3/SDL_log.h>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const string& vertex_filename, const string& frag_filename)
 {
@@ -95,4 +96,10 @@ void Shader::set_float(const string &name, const float val) const
 {
     use();
     glUniform1f(glGetUniformLocation(id, name.c_str()), val);
+}
+
+void Shader::set_mat4(const string &name, const mat4 &val) const
+{
+    use();
+    glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));
 }
