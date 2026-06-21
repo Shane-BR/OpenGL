@@ -5,6 +5,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(SDL3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME})
 
@@ -14,6 +15,7 @@ PRIVATE
     src/shader.cpp
     src/utils.cpp
     src/texture.cpp
+    src/camera.cpp
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
@@ -21,6 +23,5 @@ target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 add_subdirectory(lib/glad/ EXCLUDE_FROM_ALL)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/lib/stb/include/)
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/lib/glm/include/)
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 glad)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 glm::glm glad)
