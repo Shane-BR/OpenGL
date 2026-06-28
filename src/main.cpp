@@ -63,8 +63,8 @@ private:
 
 public:
     Application(int w, int h, const string& title);
-    void main_loop();
-    void render_loop();
+    void mainLoop();
+    void renderLoop();
     ~Application() { SDL_Quit(); }
 };
 
@@ -199,7 +199,7 @@ Application::Application(int w, int h, const string& title)
 
 }
 
-void Application::main_loop()
+void Application::mainLoop()
 {
     SDL_Event event;
 
@@ -208,7 +208,7 @@ void Application::main_loop()
     while (running) 
     {
         
-        render_loop();
+        renderLoop();
 
         float current_frame = SDL_GetTicks() / 1000.0f;
         delta_time = current_frame - last_frame;
@@ -221,19 +221,19 @@ void Application::main_loop()
         if (key_states[SDL_SCANCODE_LSHIFT]) 
             //cam.increase_movement_speed(3.0f);
         if (key_states[SDL_SCANCODE_W])
-            cam.handle_movement(CameraDirection::FORWARD, delta_time);
+            cam.handleMovement(CameraDirection::FORWARD, delta_time);
         if (key_states[SDL_SCANCODE_S])
-            cam.handle_movement(CameraDirection::BACKWARD, delta_time);
+            cam.handleMovement(CameraDirection::BACKWARD, delta_time);
         if (key_states[SDL_SCANCODE_A])
-            cam.handle_movement(CameraDirection::LEFT, delta_time);
+            cam.handleMovement(CameraDirection::LEFT, delta_time);
         if (key_states[SDL_SCANCODE_D])
-            cam.handle_movement(CameraDirection::RIGHT, delta_time);
+            cam.handleMovement(CameraDirection::RIGHT, delta_time);
 
         // Mouse
         if (m_down && cam.fov > 30.0f)
-            cam.handle_zoom(-250.0f, delta_time);
+            cam.handleZoom(-250.0f, delta_time);
         else if (!m_down && cam.fov < 60.0f)
-            cam.handle_zoom(250.0f, delta_time);
+            cam.handleZoom(250.0f, delta_time);
 
         // TODO Abstract to some other function/method/class
         while(SDL_PollEvent(&event))
@@ -246,7 +246,7 @@ void Application::main_loop()
                     break;
                 // TODO call mouse input handler for following mouse events
                 case SDL_EVENT_MOUSE_MOTION:
-                    cam.handle_look_around(event.motion.xrel, event.motion.yrel);
+                    cam.handleLookAround(event.motion.xrel, event.motion.yrel);
                     break;
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     if (event.button.button == SDL_BUTTON_MIDDLE)
@@ -264,7 +264,7 @@ void Application::main_loop()
     }
 }
 
-void Application::render_loop()
+void Application::renderLoop()
 {
     // Draw
     // TODO this code should, in the future, call a "render queue" that calls all
@@ -277,12 +277,12 @@ void Application::render_loop()
     textures[0].bind(0);
     textures[1].bind(1);
 
-    glm::mat4 view = cam.get_view_matrix();
+    glm::mat4 view = cam.getViewMatrix();
 
     glm::mat4 projection = glm::perspective(glm::radians(cam.fov), (float)W_WIDTH / W_HEIGHT, 0.1f, 100.0f);
 
-    shaders[0].set_mat4("view", view);
-    shaders[0].set_mat4("projection", projection);
+    shaders[0].setMat4("view", view);
+    shaders[0].setMat4("projection", projection);
 
     // Draw a few cubes
     glBindVertexArray(VAO);
@@ -293,7 +293,7 @@ void Application::render_loop()
         float angle = (SDL_GetTicks() / 1000.0f) * glm::radians(50.0f + i*10);
         model = glm::rotate(model, angle, glm::vec3(0.5f, 1.0f, 0.0f));
 
-        shaders[0].set_mat4("model", model);
+        shaders[0].setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -310,10 +310,10 @@ int main()
     textures.emplace_back(Texture("../res/textures/container.jpg"));
     textures.emplace_back(Texture("../res/textures/awesomeface.png"));
 
-    shaders[0].set_int("u_texture1", 0);
-    shaders[0].set_int("u_texture2", 1);
+    shaders[0].setInt("u_texture1", 0);
+    shaders[0].setInt("u_texture2", 1);
 
-    app.main_loop();
+    app.mainLoop();
 
     return 0;
 }

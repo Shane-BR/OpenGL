@@ -38,17 +38,17 @@ private:
 public:
     float fov = 60.0f; // TODO default value should be pulled from user settings
 
-    Camera(const vec3& _position, const float _pitch=0.0f, const float _yaw=-90.0f);
+    Camera(const vec3& _position, float _pitch=0.0f, float _yaw=-90.0f);
     Camera(const float x, const float y, const float z, 
-        const float _pitch=0.0f, const float _yaw=-90.0f);
-    mat4 get_view_matrix() const;
+        float _pitch=0.0f, float _yaw=-90.0f);
+    mat4 getViewMatrix() const;
     // pitch_max/_min is only used when constrain_pitch is true
-    void handle_look_around
+    void handleLookAround
     (
-        const float x_offset, const float y_offset, 
-        const bool constrain_pitch = true, const float pitch_max = 89.0f, const float pitch_min = -89.0f
+        float x_offset, float y_offset, 
+        bool constrain_pitch = true, float pitch_max = 89.0f, float pitch_min = -89.0f
     );
-    void handle_movement(const CameraDirection direction, const float delta_time);
-    void handle_zoom(const float zoom, const float delta_time);
-    void increase_movement_speed(const float factor);
+    void handleMovement(CameraDirection direction, float delta_time);
+    void handleZoom(float zoom, float delta_time);
+    void increaseMovementSpeed(float factor);
 };

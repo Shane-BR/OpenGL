@@ -6,8 +6,8 @@
 
 Shader::Shader(const string& vertex_filename, const string& frag_filename)
 {
-    const string vertex_source = get_file_content(vertex_filename);
-    const string frag_source = get_file_content(frag_filename);
+    const string vertex_source = getFileContents(vertex_filename);
+    const string frag_source = getFileContents(frag_filename);
 
     if (vertex_source.empty())
     {
@@ -75,30 +75,30 @@ void Shader::use() const
     glUseProgram(id);
 }
 
-unsigned int Shader::get_id()
+unsigned int Shader::getId()
 {
     return id;
 }
 
-void Shader::set_bool(const string &name, const bool val) const
+void Shader::setBool(const string &name, const bool val) const
 {
     use();
     glUniform1i(glGetUniformLocation(id, name.c_str()), (int)val);
 }
 
-void Shader::set_int(const string &name, const int val) const
+void Shader::setInt(const string &name, const int val) const
 {
     use();
     glUniform1i(glGetUniformLocation(id, name.c_str()), val);
 }
 
-void Shader::set_float(const string &name, const float val) const
+void Shader::setFloat(const string &name, const float val) const
 {
     use();
     glUniform1f(glGetUniformLocation(id, name.c_str()), val);
 }
 
-void Shader::set_mat4(const string &name, const mat4 &val) const
+void Shader::setMat4(const string &name, const mat4 &val) const
 {
     use();
     glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));

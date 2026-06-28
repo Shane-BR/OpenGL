@@ -71,7 +71,7 @@ void Texture::bind(int unit)
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
-unsigned int Texture::get_id()
+unsigned int Texture::getId()
 {
     return id;
 }

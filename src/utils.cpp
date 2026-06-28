@@ -8,7 +8,7 @@ using std::fstream, std::string;
 // TODO Read size of file to determine the max content size
 constexpr short MAX_FILE_CONTENT_SIZE = 512;
 
-string get_file_content(const string& filename)
+string getFileContents(const string& filename)
 {
     fstream f;
     string out {};

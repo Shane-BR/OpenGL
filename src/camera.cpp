@@ -34,12 +34,12 @@ void Camera::update_vectors()
     direction_up = normalize(cross(direction_right, direction_front));
 }
 
-mat4 Camera::get_view_matrix() const
+mat4 Camera::getViewMatrix() const
 {
     return lookAt(position, position + direction_front, direction_up);
 }
 
-void Camera::handle_look_around
+void Camera::handleLookAround
 (
     const float x_offset, const float y_offset, 
     const bool constrain_pitch, const float pitch_max, const float pitch_min
@@ -63,7 +63,7 @@ void Camera::handle_look_around
     update_vectors();
 }
 
-void Camera::handle_movement(const CameraDirection direction, const float delta_time)
+void Camera::handleMovement(const CameraDirection direction, const float delta_time)
 {
     float velocity = movement_speed * delta_time;
     switch (direction) 
@@ -85,12 +85,12 @@ void Camera::handle_movement(const CameraDirection direction, const float delta_
     update_vectors();
 }
 
-void Camera::handle_zoom(const float zoom, const float delta_time)
+void Camera::handleZoom(const float zoom, const float delta_time)
 {
     fov += zoom * delta_time;
 }
 
-void Camera::increase_movement_speed(const float factor)
+void Camera::increaseMovementSpeed(const float factor)
 {
     movement_speed *= factor;
 }
