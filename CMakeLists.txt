@@ -16,6 +16,7 @@ PRIVATE
     src/utils.cpp
     src/texture.cpp
     src/camera.cpp
+    src/input.cpp
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)

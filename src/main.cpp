@@ -1,3 +1,4 @@
+#include "input.hpp"
 #include "shader.hpp"
 #include "utils.hpp"
 #include "texture.hpp"
@@ -58,6 +59,8 @@ class Application
 {
 private:
     SDL_Window* window;
+    InputManager manager; // TODO input test
+    InputMapper mapper;
     string title;
     bool running;
 
@@ -112,6 +115,15 @@ Application::Application(int w, int h, const string& title)
     SDL_SetWindowRelativeMouseMode(window, true);
 
     running = true;
+
+    mapper.addBinding(SDL_SCANCODE_W, Action::MoveForward);
+    mapper.addBinding(SDL_SCANCODE_S, Action::MoveBakcward);
+    mapper.addBinding(SDL_SCANCODE_A, Action::MoveLeft);
+    mapper.addBinding(SDL_SCANCODE_D, Action::MoveRight);
+    mapper.addBinding(SDL_SCANCODE_E, Action::Use);
+
+
+    manager.addListener(&mapper);
 
     // TODO Remove
     float vertices[] 
@@ -203,8 +215,6 @@ void Application::mainLoop()
 {
     SDL_Event event;
 
-    bool m_down = false;
-
     while (running) 
     {
         
@@ -214,26 +224,7 @@ void Application::mainLoop()
         delta_time = current_frame - last_frame;
         last_frame = current_frame;
 
-        // TODO Abstract to some other function/method/class
-        // Input
-        // Keyboard
-        const bool* key_states = SDL_GetKeyboardState(NULL);
-        if (key_states[SDL_SCANCODE_LSHIFT]) 
-            //cam.increase_movement_speed(3.0f);
-        if (key_states[SDL_SCANCODE_W])
-            cam.handleMovement(CameraDirection::FORWARD, delta_time);
-        if (key_states[SDL_SCANCODE_S])
-            cam.handleMovement(CameraDirection::BACKWARD, delta_time);
-        if (key_states[SDL_SCANCODE_A])
-            cam.handleMovement(CameraDirection::LEFT, delta_time);
-        if (key_states[SDL_SCANCODE_D])
-            cam.handleMovement(CameraDirection::RIGHT, delta_time);
-
-        // Mouse
-        if (m_down && cam.fov > 30.0f)
-            cam.handleZoom(-250.0f, delta_time);
-        else if (!m_down && cam.fov < 60.0f)
-            cam.handleZoom(250.0f, delta_time);
+        manager.update();
 
         // TODO Abstract to some other function/method/class
         while(SDL_PollEvent(&event))
@@ -246,16 +237,16 @@ void Application::mainLoop()
                     break;
                 // TODO call mouse input handler for following mouse events
                 case SDL_EVENT_MOUSE_MOTION:
-                    cam.handleLookAround(event.motion.xrel, event.motion.yrel);
+                    manager.dispatchMouseMotionData(event.motion.xrel, event.motion.yrel);
                     break;
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    if (event.button.button == SDL_BUTTON_MIDDLE)
-                        m_down = true;
-                    break;
                 case SDL_EVENT_MOUSE_BUTTON_UP:
-                    if (event.button.button == SDL_BUTTON_MIDDLE)
-                        m_down = false;
+                    manager.dispatchMouseButtonData(event.button.button, event.button.down);
                     break;
+                case SDL_EVENT_KEY_DOWN:
+                case SDL_EVENT_KEY_UP:
+                    manager.dispatchKeyboardButtonData(event.key.scancode, event.key.down);
+                    break; 
                 default:
                     //SDL_Log("Unhandled Event.\n");
                     break;
