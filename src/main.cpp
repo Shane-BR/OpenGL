@@ -116,11 +116,11 @@ Application::Application(int w, int h, const string& title)
 
     running = true;
 
-    mapper.addBinding(SDL_SCANCODE_W, Action::MoveForward);
-    mapper.addBinding(SDL_SCANCODE_S, Action::MoveBakcward);
-    mapper.addBinding(SDL_SCANCODE_A, Action::MoveLeft);
-    mapper.addBinding(SDL_SCANCODE_D, Action::MoveRight);
-    mapper.addBinding(SDL_SCANCODE_E, Action::Use);
+    mapper.addKeyboardBinding(SDL_SCANCODE_W, Action::MoveForward);
+    mapper.addKeyboardBinding(SDL_SCANCODE_S, Action::MoveBakcward);
+    mapper.addKeyboardBinding(SDL_SCANCODE_A, Action::MoveLeft);
+    mapper.addKeyboardBinding(SDL_SCANCODE_D, Action::MoveRight);
+    mapper.addKeyboardBinding(SDL_SCANCODE_E, Action::Use);
 
 
     manager.addListener(&mapper);

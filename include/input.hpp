@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL_scancode.h>
+#include <cstdint>
 #include <unordered_map>
 
 using std::unordered_map;
@@ -17,7 +18,7 @@ constexpr ButtonID getKeyboardButtonID(SDL_Scancode scancode)
     return (ButtonID)scancode;
 }
 
-constexpr ButtonID getMouseButtonID(unsigned int mouse_button)
+constexpr ButtonID getMouseButtonID(uint8_t mouse_button)
 {
     return mouse_button + SDL_SCANCODE_COUNT;
 }
@@ -87,8 +88,14 @@ class InputMapper : public IInputListener
 {
 private:
     unordered_map<ButtonID, Action> bindings;
-public:
     void addBinding(ButtonID button_id, Action action);
+public:
+    void addMouseBinding(uint8_t mouse_button, Action action) 
+        { addBinding(getMouseButtonID(mouse_button), action); }
+
+    void addKeyboardBinding(SDL_Scancode scancode, Action action) 
+        { addBinding(getKeyboardButtonID(scancode), action); }
+
     void onButton(ButtonData button_data) override;
     void onMouseMotion(MouseMotionData mouse_data) override;
 };
